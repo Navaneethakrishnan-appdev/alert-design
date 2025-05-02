@@ -1,4 +1,6 @@
 import 'package:alert_design/lockdown_incident_detail.dart';
+import 'package:alert_design/main.dart';
+import 'package:alert_design/service/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +15,13 @@ class _LockdownSlideButtonState extends State<LockdownSlideButton> {
   double _dragPosition = 0.0;
   double _dragPercentage = 0.0;
   bool _completed = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    NotificationService.initialize(flutterLocalNotificationsPlugin);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,13 +146,20 @@ class _LockdownSlideButtonState extends State<LockdownSlideButton> {
                           });
                         }
                       },
-                      onHorizontalDragEnd: (details) {
+                      onHorizontalDragEnd: (details) async {
                         if (_dragPercentage > 0.8) {
                           // If dragged enough
                           setState(() {
                             _completed = true;
                             _dragPosition = buttonWidth - 80;
                           });
+
+                          await NotificationService.showBigTextNotification(
+                            title: "EMERGENCY",
+                            body: "Emergency Lockdown",
+                            fln: flutterLocalNotificationsPlugin,
+                          );
+
                           Future.delayed(Duration(seconds: 1), () {
                             Navigator.push(
                               context,
